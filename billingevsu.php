@@ -69,13 +69,15 @@ $stallx = $conn->query($query);
                       $date_filed = $row['date_filed'];
                       $time = strtotime($date_filed);
                       $datefiled = date("M d, Y | g:i A", $time);
+                       $fullyPaid = $row['status'] === '1' && $row['amount'] != $row['amount_paid'];
+                      $bgColor = $row['status'] === '1' ? ($fullyPaid ? 'primary' : 'success') : 'secondary';
                       ?>
                       <tr>
                         <td><?php echo $row['stall_name']; ?></td>
                         <td><b>₱ <?php echo number_format($row['amount'], 2); ?></b></td>
                         <td><?php echo $datefiled; ?></td>
                         <td>
-                          <span class="text-light px-3 py-2 rounded-sm bg-<?php echo $row['status'] == 1 ? 'success' : 'secondary'?> " ><?php echo $row['status'] == 0 ? 'Pending' : 'Paid' ?></span>
+                          <span class="text-light px-3 py-2 rounded-sm bg-<?php echo $bgColor; ?>"><?php echo $row['status'] == 0 ? 'Pending' : 'Paid'; ?></span>
                         </td>
                         <td class="d-flex justify-content-end">
                           <button class="btn btn-primary btn-sm mr-2" data-bs-toggle='tooltip' data-bs-placement='top' title='view receipt' data-toggle="modal" data-target="#c_receipt<?php echo ($row["billing_id"]); ?>">
