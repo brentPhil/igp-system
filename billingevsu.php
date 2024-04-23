@@ -64,7 +64,15 @@ $stallx = $conn->query($query);
                     </thead>
                     <tbody>
                     <?php
-                    $result = mysqli_query($conn,"SELECT * FROM billing INNER JOIN stalls ON billing.billing_stall = stalls.stall_id");
+                    $result = mysqli_query($conn,"
+                      SELECT b.*, s.stall_name 
+                      FROM billing b 
+                      INNER JOIN stalls s ON b.billing_stall = s.stall_id 
+                      INNER JOIN (
+                          SELECT billing_stall, MAX(date_filed) AS max_date_filed 
+                          FROM billing 
+                          GROUP BY billing_stall
+                      ) max_dates ON b.billing_stall = max_dates.billing_stall AND b.date_filed = max_dates.max_date_filed");
                     while($row = mysqli_fetch_array($result)) {
                       $date_filed = $row['date_filed'];
                       $time = strtotime($date_filed);
