@@ -9,7 +9,7 @@ $result = mysqli_query($conn,"SELECT * FROM users WHERE user_id='" . $_SESSION['
 $row= mysqli_fetch_array($result);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> 
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">

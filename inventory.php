@@ -5,9 +5,8 @@ session_start();
 include 'include/config.php';
 if(!isset($_SESSION["user_type"]))
     header("location:login.php");
-$result = mysqli_query($conn,"SELECT *, faculty.my_stock as fms FROM users LEFT JOIN faculty ON users.faculty_id = faculty.id WHERE user_id='" . $_SESSION['user_id'] . "'");
+$result = mysqli_query($conn,"SELECT * FROM users LEFT JOIN faculty ON users.faculty_id = faculty.id WHERE user_id='" . $_SESSION['user_id'] . "'");
 $row= mysqli_fetch_array($result);
-$rowx = $row;
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -105,31 +104,49 @@ $rowx = $row;
                                         $no = 1;
                                         $filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
                                         $filterDepartment = isset($_GET['filterDepartment']) ? $_GET['filterDepartment'] : '';
+                                        $faculty = $_SESSION["user_type"] === 'Faculty';
 
-                                        $query = "SELECT * FROM products WHERE 1";
-                                        $queryLogs = $conn->query("SELECT * FROM logs WHERE userid = '".$rowx['id']."'");
+                                        $query = "SELECT *, products.id AS product_id, 
+                                                            products.stock AS product_stock,
+                                                            products.updated AS product_updated
+                                                            FROM products WHERE 1";
+                                        if($faculty){
+                                            $query = "SELECT 
+                                                        products.id AS product_id,
+                                                        products.type,
+                                                        products.description,
+                                                        products.department,
+                                                        products.stock AS product_stock,
+                                                        products.updated AS product_updated,
+                                                        faculty_stock.id AS faculty_stock_id,
+                                                        faculty_stock.faculty_id,
+                                                        faculty_stock.product_id AS faculty_product_id,
+                                                        faculty_stock.stock AS faculty_product_stock,
+                                                        SUM(logs.quantity) AS total_quantity
+                                                    FROM 
+                                                        faculty_stock
+                                                    INNER JOIN 
+                                                        products ON products.id = faculty_stock.product_id
+                                                    LEFT JOIN 
+                                                        logs ON logs.product_id = products.id AND logs.userid = faculty_stock.faculty_id
+                                                    WHERE 
+                                                        faculty_stock.faculty_id = '".$row['id']."'
+                                                    GROUP BY 
+                                                        products.id, faculty_stock.id;
+                                                    ";
+                                        }
 
-                                        if (!empty($filterType)) {
+                                        if (!empty($filterType) && $faculty === false) {
                                             $query .= " AND type = '$filterType'";
                                         }
 
-                                        if (!empty($filterDepartment)) {
+                                        if (!empty($filterDepartment) && $faculty === false) {
                                             $query .= " AND department = '$filterDepartment'";
-                                        }
-
-                                        $dept = $rowx['department'];
-                                        $faculty = $_SESSION["user_type"] === 'Faculty';
-                                        if ($faculty) {
-                                            $query .= " AND department = '$dept'";
                                         }
 
                                         $result = mysqli_query($conn, $query);
 
-                                        $stockOutTotal = 0;
-
-                                        while($logResult = mysqli_fetch_array($queryLogs)){
-                                            $stockOutTotal += $logResult['quantity'];
-                                        }
+                                        $admin_or_staff = $_SESSION['user_type'] == 'Administrator' || $_SESSION['user_type'] == 'Staff';
 
                                         if ($result->num_rows > 0) {
                                             echo "<table class='table table-bordered'><tr><th>Name</th><th>Requesting Department</th><th>IGP Stock</th>";
@@ -137,30 +154,30 @@ $rowx = $row;
                                             if($faculty) {echo "<th>Stock Out</th>";}
                                             echo "<th>Updated At</th><th>Action</th></tr>";
                                             while($row = $result->fetch_assoc()) {
-                                                $date_filed = $row['updated'];
+                                                $date_filed = $row['product_updated'];
                                                 $time = strtotime($date_filed);
                                                 $updated = date("F d Y, g:i A", $time);
                                                 echo "<tr>";
                                                 echo "<td>".$row["type"]."</td>";
                                                 echo "<td>".$row['department']."</td>";
-                                                echo "<td>".$row['stock']."</td>";
-                                                if($faculty) {echo "<td>".$rowx['my_stock']."</td>";}
-                                                if($faculty) {echo "<td>".$stockOutTotal."</td>";}
+                                                echo "<td>".$row['product_stock']."</td>";
+                                                if($faculty) {echo "<td>".$row['faculty_product_stock']."</td>";}
+                                                if($faculty) {echo "<td>".$row['total_quantity']."</td>";}
                                                 echo "<td>".$updated."</td>";
-                                                if ($rowx['user_type'] == 'Administrator' || $rowx['user_type'] == 'Staff') {
-                                                    echo "<td><button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#sellItem{$row['id']}' title='Sell'><i class='bi bi-bag-dash'></i></button>";
+                                                if ($admin_or_staff) {
+                                                    echo "<td><button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#sellItem{$row['product_id']}' title='Sell'><i class='bi bi-bag-dash'></i></button>";
                                                 }
                                                 else {
-                                                    echo "<td><button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#sellItems{$rowx['id']}' title='Sell'><i class='bi bi-bag-dash'></i></button>";
-                                                    echo " <button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#stockRequests{$row['id']}' title='Request Stock'><i class='bi bi-bag-heart'></i> </button>";
+                                                    echo "<td><button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#sellItems{$row['product_id']}' title='Sell'><i class='bi bi-bag-dash'></i></button>";
+                                                    echo " <button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#stockRequests{$row['product_id']}' title='Request Stock'><i class='bi bi-bag-heart'></i> </button>";
                                                 }
-                                                if ($rowx['user_type'] == 'Administrator' || $rowx['user_type'] == 'Staff') {
-                                                    echo " <button class='btn btn-success btn-sm' data-toggle='modal' data-target='#addStock{$row['id']}' title='Add Stock'><i class='bi bi-plus-circle'></i></button></td>";
+                                                if ($admin_or_staff) {
+                                                    echo " <button class='btn btn-success btn-sm' data-toggle='modal' data-target='#addStock{$row['product_id']}' title='Add Stock'><i class='bi bi-plus-circle'></i></button></td>";
                                                 }
                                                 echo "</tr>";
 
                                                 ?>
-                                                <div class='modal fade' id='sellItem<?php echo $row['id'] ?>' tabindex='-1' role='dialog' aria-labelledby='sellItemModalLabel' aria-hidden='true'>
+                                                <div class='modal fade' id='sellItem<?php echo $row['product_id'] ?>' tabindex='-1' role='dialog' aria-labelledby='sellItemModalLabel' aria-hidden='true'>
                                                     <div class='modal-dialog' role='document'>
                                                         <div class='modal-content'>
                                                             <div class='modal-header'>
@@ -174,7 +191,7 @@ $rowx = $row;
                                                                     <div class='form-group'>
                                                                         <label for='quantity'>Quantity:</label>
                                                                         <input type='number' class='form-control' id='quantity' name='quantity' required>
-                                                                        <input type='hidden' name='pid' value='<?php echo $row['id'] ?>'>
+                                                                        <input type='hidden' name='pid' value='<?php echo $row['product_id'] ?>'>
                                                                     </div>
                                                                     <button type='submit' class='btn btn-danger' name='sellItem'>Sell</button>
                                                                 </form>
@@ -183,7 +200,7 @@ $rowx = $row;
                                                     </div>
                                                 </div>
 
-                                                <div class='modal fade' id='sellItems<?php echo $rowx['id'] ?>' tabindex='-1' role='dialog' aria-labelledby='sellItemModalLabel' aria-hidden='true'>
+                                                <div class='modal fade' id='sellItems<?php echo $row['product_id'] ?>' tabindex='-1' role='dialog' aria-labelledby='sellItemModalLabel' aria-hidden='true'>
                                                     <div class='modal-dialog' role='document'>
                                                         <div class='modal-content'>
                                                             <div class='modal-header'>
@@ -197,7 +214,7 @@ $rowx = $row;
                                                                     <div class='form-group'>
                                                                         <label for='quantity'>Quantity:</label>
                                                                         <input type='number' class='form-control' id='quantity' name='quantity' required>
-                                                                        <input type='hidden' name='fid' value='<?php echo $rowx['id'] ?>'>
+                                                                        <input type='hidden' name='fid' value='<?php echo $row['product_id'] ?>'>
                                                                     </div>
                                                                     <button type='submit' class='btn btn-danger' name='sellItems'>Sell</button>
                                                                 </form>
@@ -206,7 +223,7 @@ $rowx = $row;
                                                     </div>
                                                 </div>
 
-                                                <div class='modal fade' id='stockRequest<?php echo $row['id'] ?>' tabindex='-1' role='dialog' aria-labelledby='stockRequestModalLabel' aria-hidden='true'>
+                                                <div class='modal fade' id='stockRequest<?php echo $row['product_id'] ?>' tabindex='-1' role='dialog' aria-labelledby='stockRequestModalLabel' aria-hidden='true'>
                                                     <div class='modal-dialog' role='document'>
                                                         <div class='modal-content'>
                                                             <div class='modal-header'>
@@ -220,7 +237,7 @@ $rowx = $row;
                                                                     <div class='form-group'>
                                                                         <label for='requestQuantity'>Request Quantity:</label>
                                                                         <input type='number' class='form-control' id='requestedStock' name='requestedStock' required>
-                                                                        <input type='hidden' name='pid' value='<?php echo $row['id'] ?>'>
+                                                                        <input type='hidden' name='pid' value='<?php echo $row['product_id'] ?>'>
                                                                     </div>
                                                                     <button type='submit' class='btn btn-primary' name='stockRequest'>Request</button>
                                                                 </form>
@@ -229,7 +246,7 @@ $rowx = $row;
                                                     </div>
                                                 </div>
 
-                                                <div class='modal fade' id='stockRequests<?php echo $row['id'] ?>' tabindex='-1' role='dialog' aria-labelledby='stockRequestModalLabel' aria-hidden='true'>
+                                                <div class='modal fade' id='stockRequests<?php echo $row['product_id'] ?>' tabindex='-1' role='dialog' aria-labelledby='stockRequestModalLabel' aria-hidden='true'>
                                                     <div class='modal-dialog' role='document'>
                                                         <div class='modal-content'>
                                                             <div class='modal-header'>
@@ -243,7 +260,7 @@ $rowx = $row;
                                                                     <div class='form-group'>
                                                                         <label for='requestQuantity'>Request Quantity:</label>
                                                                         <input type='number' class='form-control' id='requestedStock' name='requestedStock' required>
-                                                                        <input type='hidden' name='pid' value='<?php echo $row['id'] ?>'>
+                                                                        <input type='hidden' name='pid' value='<?php echo $row['product_id'] ?>'>
                                                                     </div>
                                                                     <button type='submit' class='btn btn-primary' name='stockRequests'>Request</button>
                                                                 </form>
@@ -252,7 +269,7 @@ $rowx = $row;
                                                     </div>
                                                 </div>
 
-                                                <div class='modal fade' id='addStock<?php echo $row['id'] ?>' tabindex='-1' role='dialog' aria-labelledby='addStockModalLabel' aria-hidden='true'>
+                                                <div class='modal fade' id='addStock<?php echo $row['product_id'] ?>' tabindex='-1' role='dialog' aria-labelledby='addStockModalLabel' aria-hidden='true'>
                                                     <div class='modal-dialog' role='document'>
                                                         <div class='modal-content'>
                                                             <div class='modal-header'>
@@ -266,7 +283,7 @@ $rowx = $row;
                                                                     <div class='form-group'>
                                                                         <label for='addQuantity'>Add Quantity:</label>
                                                                         <input type='number' class='form-control' id='quantity' name='quantity' required>
-                                                                        <input type='hidden' name='pid' value='<?php echo $row['id'] ?>'>
+                                                                        <input type='hidden' name='pid' value='<?php echo $row['product_id'] ?>'>
                                                                     </div>
                                                                     <button type='submit' class='btn btn-success' name='addStock'>Add</button>
                                                                 </form>
@@ -351,10 +368,12 @@ $rowx = $row;
                         <div class='table-responsive'>
                             <?php
                             // Fetch stock requests from the database
-                            $result = mysqli_query($conn, "SELECT *, requests.id, requests.datetime as rd, requests.stock as rs, faculty.id as fid FROM requests INNER JOIN products ON requests.product = products.id INNER JOIN faculty ON requests.user_id = faculty.id");
+                            $result = mysqli_query($conn, "SELECT *, requests.id, requests.datetime as rd, requests.stock as rs, faculty.id as fid, products.id AS pid FROM requests INNER JOIN products ON requests.product = products.id INNER JOIN faculty ON requests.user_id = faculty.id");
                             if ($result->num_rows > 0) {
                                 echo "<table class='table table-bordered'><tr><th>Requested By</th></th><th>Product</th><th>Description</th><th>amount</th><th>Datetime</th><th>Action</th></tr>";
                                 while ($row = $result->fetch_assoc()) {
+                                    $faculty_stock = mysqli_query($conn, "SELECT * FROM faculty_stock WHERE faculty_id = '".$row['fid']."' AND product_id = '".$row['pid']."'");
+                                    $fs = mysqli_fetch_array($faculty_stock);
                                     $date_filed = $row['rd'];
                                     $time = strtotime($date_filed);
                                     $updated = date("F d Y, g:i A", $time);
@@ -367,7 +386,7 @@ $rowx = $row;
                                     echo "<td>";
                                     echo "<form method='post'>";
                                     echo "<input type='hidden' name='requestId' value='".$row['id']."'>";
-                                    echo "<input type='hidden' name='my_stock' value='".$row['my_stock']."'>";
+                                    echo "<input type='hidden' name='my_stock' value='".$fs['stock']."'>";
                                     echo "<input type='hidden' name='fid' value='".$row['fid']."'>";
                                     echo "<button type='submit' class='btn btn-success btn-sm' name='approveStockRequest'>Approve</button>";
                                     echo "</form>";
@@ -410,10 +429,30 @@ $rowx = $row;
 <?php
 function addStock($pid, $quantity, $my_stock, $fid) {
     global $conn;
+
+    // Update product stock
     $sql = "UPDATE products SET stock = stock - $quantity WHERE id = $pid";
-    $conn->query("UPDATE faculty SET my_stock = $my_stock + $quantity WHERE id = $fid");
-    return $conn->query($sql);
+    $productUpdateResult = $conn->query($sql);
+
+    // Calculate new stock for faculty_stock
+    $stock = $my_stock + $quantity;
+
+    // Check if the faculty_stock entry exists
+    $facultyStockResult = $conn->query("SELECT * FROM faculty_stock WHERE faculty_id = $fid AND product_id = $pid");
+
+    if ($facultyStockResult && $facultyStockResult->num_rows > 0) {
+        // Update existing faculty_stock entry
+        $update_stock = $conn->query("UPDATE faculty_stock SET stock = $stock WHERE faculty_id = $fid AND product_id = $pid");
+    } else {
+        // Insert new faculty_stock entry
+        $conn->query("INSERT INTO faculty_stock (faculty_id, product_id, stock) VALUES ('$fid', '$pid', '$stock')");
+        // Set $update_stock to true because the insert happened
+        $update_stock = true;
+    }
+
+    return $productUpdateResult && $update_stock;
 }
+
 // Function to add a new product
 function addProduct($type, $department, $description, $stock) {
     global $conn;
@@ -547,19 +586,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["sellItems"])) {
     $user_id = $_SESSION["faculty_id"];
 
     // Check if the product exists and has sufficient stock for sale
-    $productQuery = "SELECT * FROM faculty WHERE id = $fid";
+    $productQuery = "SELECT * FROM faculty_stock WHERE product_id = $fid";
     $productResult = $conn->query($productQuery);
 
     if ($productResult->num_rows > 0) {
         $productData = $productResult->fetch_assoc();
-        $currentStock = $productData['my_stock'];
+        $currentStock = $productData['stock'];
 
         if ($currentStock >= $quantity && $quantity > 0) {
             // Perform the sale - Update the stock after selling items
             $newStock = $currentStock - $quantity;
-            $updateStockQuery = "UPDATE faculty SET my_stock = $newStock WHERE id = $fid";
+            $updateStockQuery = "UPDATE faculty_stock SET stock = $newStock WHERE product_id = $fid";
             if ($conn->query($updateStockQuery) === TRUE) {
-                $addLog = "INSERT INTO logs (log, quantity, userid) VALUES ('Sold a stock of',  '$quantity', '$user_id')";
+                $addLog = "INSERT INTO logs (log, quantity, product_id, userid) VALUES ('Sold a stock of',  '$quantity', $fid, '$user_id')";
                 $saveLog = mysqli_query($conn, $addLog);
                 // Sale successful
                 echo "<script>
@@ -678,80 +717,75 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["addStock"])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["stockRequest"])) {
-    if (isset($_POST["stockRequest"])) {
-        $pid = $_POST["pid"];
-        $requestedStock = $_POST["requestedStock"];
+    $pid = $_POST["pid"];
+    $requestedStock = $_POST["requestedStock"];
 
-        // Add the new product
-        if (stockRequest($pid, $requestedStock)) {
-            ?>
-            <script>
-                Swal.fire({
-                    title: 'success',
-                    text: 'Request Inserted',
-                    icon: 'success',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(function() {
-                    window.location.href = "inventory.php";
-                });
-            </script>
-            <?php
-        } else {
-            ?>
-            <script>
-                Swal.fire({
-                    title: 'error',
-                    text: 'Error Inserting',
-                    icon: 'error',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(function() {
-                    window.location.href = "inventory.php";
-                });
-            </script>
-            <?php
-        }
+    // Add the new product
+    if (stockRequest($pid, $requestedStock)) {
+        ?>
+        <script>
+            Swal.fire({
+                title: 'success',
+                text: 'Request Inserted',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(function() {
+                window.location.href = "inventory.php";
+            });
+        </script>
+        <?php
+    } else {
+        ?>
+        <script>
+            Swal.fire({
+                title: 'error',
+                text: 'Error Inserting',
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(function() {
+                window.location.href = "inventory.php";
+            });
+        </script>
+        <?php
     }
-
-    // Add code to handle other form submissions (Add Stock, Purchase Items, Update Stock) if needed
 }
 
+// Add code to handle other form submissions (Add Stock, Purchase Items, Update Stock) if needed
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["stockRequests"])) {
-    if (isset($_POST["stockRequests"])) {
-        $pid = $_POST["pid"];
-        $requestedStock = $_POST["requestedStock"];
+    $pid = $_POST["pid"];
+    $requestedStock = $_POST["requestedStock"];
 
-        // Add the new product
-        if (stockRequest($pid, $requestedStock)) {
-            ?>
-            <script>
-                Swal.fire({
-                    title: 'success',
-                    text: 'Request Inserted',
-                    icon: 'success',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(function() {
-                    window.location.href = "inventory.php";
-                });
-            </script>
-            <?php
-        } else {
-            ?>
-            <script>
-                Swal.fire({
-                    title: 'error',
-                    text: 'Error Inserting',
-                    icon: 'error',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(function() {
-                    window.location.href = "inventory.php";
-                });
-            </script>
-            <?php
-        }
+    // Add the new product
+    if (stockRequest($pid, $requestedStock)) {
+        ?>
+        <script>
+            Swal.fire({
+                title: 'success',
+                text: 'Request Inserted',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(function() {
+                window.location.href = "inventory.php";
+            });
+        </script>
+        <?php
+    } else {
+        ?>
+        <script>
+            Swal.fire({
+                title: 'error',
+                text: 'Error Inserting',
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(function() {
+                window.location.href = "inventory.php";
+            });
+        </script>
+        <?php
     }
 
     // Add code to handle other form submissions (Add Stock, Purchase Items, Update Stock) if needed

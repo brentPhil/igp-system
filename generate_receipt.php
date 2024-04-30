@@ -4,15 +4,15 @@ require_once('tcpdf/tcpdf.php');
 include 'include/config.php';
 
 $id = $_GET['id'];
-$sql = "SELECT * FROM reports INNER JOIN stalls ON reports.billing_stall = stalls.stall_id INNER JOIN tenant ON tenant.stall_id = stalls.stall_id INNER JOIN users ON tenant.user = users.user_id WHERE id = '$id'";
+$sql = "SELECT * FROM billing INNER JOIN stalls ON billing.billing_stall = stalls.stall_id INNER JOIN tenant ON tenant.stall_id = stalls.stall_id INNER JOIN users ON tenant.user = users.user_id WHERE billing_id = '$id'";
 $result = $conn->query($sql);
 
 $stall = '';
 
 while ($row = mysqli_fetch_array($result)) {
-    $date_pay = date('F d, Y', strtotime($row['date_pay']));
+    $date_pay = date('F d, Y');
     $date_pay2 = date('F Y', strtotime($row['date_pay']));
-    $prevBillingSQL = "SELECT * FROM reports WHERE billing_stall = '{$row['billing_stall']}' AND id < '$id' ORDER BY date_pay DESC LIMIT 1";
+    $prevBillingSQL = "SELECT * FROM billing WHERE billing_stall = '{$row['billing_stall']}' AND billing_id < '$id' ORDER BY date_pay DESC LIMIT 1";
     $prevBillingResult = $conn->query($prevBillingSQL);
     $prevBillingRow = mysqli_fetch_array($prevBillingResult);
     $stall = $row['billing_stall'];
@@ -77,7 +77,6 @@ while ($row = mysqli_fetch_array($result)) {
     $pdf->Cell(0, 5, '        Water Bill                                                                                               ' . number_format($row['water_bal'], 2), 0, 1);
     $pdf->Cell(0, 5, '        Other Bill                                                                                                ' . number_format($row['other_bal'], 2), 0, 1);
     $pdf->SetFont('helvetica', 'B', 12);
-    $pdf->Cell(0, 5, '        Total Current Monthly Bill                                                                   ' . number_format($row['amount'], 2), 0, 1);
     if ($excessPayment > 0) {
         $pdf->Cell(0, 5, '        EXCESS PAYMENT FROM CURRENT BILLING                                                                   ' . number_format($excessPayment, 2), 0, 1);
     }
@@ -87,14 +86,18 @@ while ($row = mysqli_fetch_array($result)) {
     $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
     $pdf->Ln(5);
     $totalRemainingAmount = 0;
-    $billingsResult = $conn->query("SELECT * FROM reports WHERE billing_stall = '$stall' AND date_approved < '{$row['date_approved']}'");
+    $pdf->Cell(0, 5, '        Total Current Monthly Bill                                                                   ' . number_format($row['amount'], 2), 0, 1);
+    $pdf->SetFont('helvetica', 12);
+    $pdf->Ln(5);
+    $totalRemainingAmount = 0;
+    $billingsResult = $conn->query("SELECT * FROM billing WHERE billing_stall = '$stall' AND date_pay > '{$row['date_pay']}'");
 
     while ($billing = mysqli_fetch_array($billingsResult)) {
         $remainingAmount = $billing['amount'] - $billing['amount_paid'];
         $totalRemainingAmount += $remainingAmount;
 
         $pdf->SetFont('helvetica', 12);
-        $pdf->Cell(0, 5, '        Remaining Balance of (' . date('F d, Y', strtotime($billing['date_approved'])) . ')                                                  ' . number_format($remainingAmount, 2), 0, 1);
+        $pdf->Cell(0, 5, '        Remaining Balance of (' . date('F d, Y', strtotime($billing['date_pay'])) . ')                                                  ' . number_format($remainingAmount, 2), 0, 1);
     }
 
     $totalRemaining = $totalRemainingAmount + $row['amount'];
@@ -109,8 +112,29 @@ while ($row = mysqli_fetch_array($result)) {
     } else {
         $pdf->Cell(0, 5, '        Total Outstanding Balance as of (' . date('F d, Y') . ')                             ' . number_format($totalRemaining, 2), 0, 1);
     }
-
     $pdf->SetFont('helvetica', 12);
+    $pdf->Ln(5);
+    $pdf->Ln(5);
+    $pdf->Cell(0, 5, '        Payment of unpaid balances is highly demanded. For further clarification and inquiries, ' ,0, 1);
+    $pdf->Cell(0, 5, '        please visit the Income Generated Office.' ,0, 1);
+    $pdf->Ln(5);
+    $pdf->Cell(0, 5, '        Thank you for your cooperation.' ,0, 1);
+    $pdf->Ln(5);
+    $pdf->Cell(0, 5, '        Prepared by:' ,0, 1);
+    $pdf->Ln(5);
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->Cell(0, 5, '        MERLITA ESTRELLA' ,0, 1);
+    $pdf->SetFont('helvetica', 12);
+    $pdf->Cell(0, 5, '        IGP Staff' ,0, 1);
+    $pdf->Ln(5);
+    $pdf->Ln(5);
+    $pdf->Cell(0, 5, '        Noted by:' ,0, 1);
+    $pdf->Ln(5);
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->Cell(0, 5, '        REYNALYN O. BARBOSA, CPA, MM' ,0, 1);
+    $pdf->SetFont('helvetica', 12);
+    $pdf->Cell(0, 5, '        IGP & Auxiliary Services Head' ,0, 1);
+
 }
 
 $pdf->Output('sample.pdf', 'I');

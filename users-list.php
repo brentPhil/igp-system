@@ -1,5 +1,5 @@
 <?php
-$activePage = basename($_SERVER['PHP_SELF'], ".php")[[]];
+$activePage = basename($_SERVER['PHP_SELF'], ".php");
 $title = "Users List";
 session_start();
 include 'include/config.php';

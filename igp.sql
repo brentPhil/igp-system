@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 27, 2024 at 02:08 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Apr 16, 2024 at 07:07 AM
+-- Server version: 10.4.24-MariaDB
+-- PHP Version: 8.1.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -41,15 +41,15 @@ CREATE TABLE `billing` (
   `status` varchar(10) NOT NULL,
   `c_receipt` varchar(255) DEFAULT NULL,
   `date_pay` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `billing`
 --
 
 INSERT INTO `billing` (`billing_id`, `billing_stall`, `rent_bal`, `water_bal`, `electricity_bal`, `other_bal`, `amount`, `amount_paid`, `date_filed`, `billing_note`, `status`, `c_receipt`, `date_pay`) VALUES
-(1, 1, '1234', '1234', '1234', '1234', '4936', '4000', '2023-12-04 10:31:33', '', '1', '020420240332.jpg', '2024-01-04'),
-(2, 1, '1234', '1234', '1234', '1234', '4936', '4936', '2024-01-04 10:37:48', '', '1', '020420240408.jpg', '2024-02-04');
+(17, 1, '1500', '200', '200', '100', '2000', '1500', '2024-04-15 10:10:50', '', '1', '041520240416.png', '2024-04-15'),
+(18, 2, '1500', '100', '100', '200', '1900', '1900', '2024-04-15 10:17:42', '', '1', '041520240425.jpg', '2024-04-15');
 
 -- --------------------------------------------------------
 
@@ -64,56 +64,57 @@ CREATE TABLE `faculty` (
   `last_name` varchar(255) NOT NULL,
   `emp_type` enum('part-time','regular','','') NOT NULL,
   `department` varchar(255) NOT NULL,
-  `datetime` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `datetime` datetime NOT NULL DEFAULT current_timestamp(),
+  `my_stock` int(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `faculty`
 --
 
-INSERT INTO `faculty` (`id`, `first_name`, `middle`, `last_name`, `emp_type`, `department`, `datetime`) VALUES
-(1, 'Aljon', 'L', 'Abines', 'regular', 'Engineering', '2024-01-16 12:25:29'),
-(2, 'Jude Michael', '', 'Badajos', 'regular', 'Engineering', '2024-01-16 12:26:18'),
-(3, 'Greg', 'S', 'Campos', 'regular', 'Engineering', '2024-01-16 12:26:32'),
-(4, 'Catherine', 'B', 'Catindoy', 'regular', 'Engineering', '2024-01-16 12:26:43'),
-(5, 'Samuel', 'S', 'Sudario', 'regular', 'Engineering', '2024-01-16 12:26:54'),
-(6, 'John Paul', '', 'Villanueva', 'regular', 'Engineering', '2024-01-16 12:27:57'),
-(7, 'Jasten Keneth', 'D', 'Treceñe', 'regular', 'Engineering', '2024-01-16 12:28:17'),
-(8, 'Marites', 'M', 'Bardelas', 'regular', 'Engineering', '2024-01-16 12:28:37'),
-(9, 'Michael', 'B', 'Batan', 'regular', 'Engineering', '2024-01-16 12:28:46'),
-(10, 'Ira Gem', 'A', 'Albasin-Lacaba', 'regular', 'Education', '2024-01-16 12:29:39'),
-(11, 'Medeliza', 'P', 'Avenir', 'regular', 'Education', '2024-01-16 12:29:57'),
-(12, 'Mary Ann', 'A', 'Balagasay', 'regular', 'Education', '2024-01-16 12:30:10'),
-(13, 'Belinda', 'R', 'Basas', 'regular', 'Education', '2024-01-16 12:30:21'),
-(14, 'Sofio Rocky', 'T', 'Caminoc', 'regular', 'Education', '2024-01-16 12:30:50'),
-(15, 'Joseph', '', 'Cervantes', 'regular', 'Education', '2024-01-16 12:31:07'),
-(16, 'Eduardo Edu', 'C', 'Cornillez, Jr.', 'regular', 'Education', '2024-01-16 12:31:30'),
-(17, 'Emelita', 'Y', 'Eguillos', 'regular', 'Education', '2024-01-16 12:31:43'),
-(18, 'Ma. Chona', '', 'Fabre', 'regular', 'Education', '2024-01-16 12:31:56'),
-(19, 'Ramelito', 'R', 'Paler', 'regular', 'Education', '2024-01-16 12:32:09'),
-(20, 'Teodora', 'S', 'Picson', 'regular', 'Education', '2024-01-16 12:32:22'),
-(21, 'Jerome', 'S', 'Tilana', 'regular', 'Education', '2024-01-16 12:32:32'),
-(22, 'James', 'R', 'Pedrera', 'regular', 'Education', '2024-01-16 12:32:45'),
-(23, 'Meldrid', 'B', 'Miranda', 'regular', 'Education', '2024-01-16 12:32:57'),
-(24, 'Jerico Ralph', 'P', 'Abides', 'regular', 'Technology', '2024-01-16 12:33:25'),
-(25, 'Paul Mikie', 'Q', 'Alcober', 'regular', 'Technology', '2024-01-16 12:33:44'),
-(26, 'Doretta Cleofe', 'D', 'Aniñon', 'regular', 'Technology', '2024-01-16 12:34:06'),
-(27, 'Rex Vincent', 'F', 'Enderio', 'regular', 'Technology', '2024-01-16 12:34:50'),
-(28, 'Bryan Dino Lester', 'M', 'Garnica', 'regular', 'Technology', '2024-01-16 12:35:08'),
-(29, 'Nikki', 'J', 'Malquisto', 'regular', 'Technology', '2024-01-16 12:35:23'),
-(30, 'Aiza', 'P', 'Meniano', 'regular', 'Technology', '2024-01-16 12:35:34'),
-(31, 'Cathy Faye', 'P', 'Pedrosa', 'regular', 'Technology', '2024-01-16 12:35:46'),
-(32, 'Deolito', 'V', 'Legaspi', 'regular', 'Technology', '2024-01-16 12:36:06'),
-(33, 'Cecil', 'B', 'Abucot', 'regular', 'BEM', '2024-01-16 12:36:31'),
-(34, 'Melissa', 'A', 'Dela Cruz', 'regular', 'BEM', '2024-01-16 12:36:42'),
-(35, 'Grace', 'N', 'Dumrigue', 'regular', 'BEM', '2024-01-16 12:37:01'),
-(36, 'Erap', 'M', 'Gultian', 'regular', 'BEM', '2024-01-16 12:37:14'),
-(37, 'Zosilyn', 'M', 'Malate', 'regular', 'BEM', '2024-01-16 12:37:25'),
-(38, 'Meg Anne', 'M', 'Villero', 'regular', 'BEM', '2024-01-16 12:37:37'),
-(39, 'Reynalyn', '', 'Barbosa', 'regular', 'BEM', '2024-01-16 12:37:54'),
-(40, 'Yolanda', '', 'Cabo', 'regular', 'BEM', '2024-01-16 12:38:04'),
-(41, 'Marilou', 'G', 'Perez', 'regular', 'BEM', '2024-01-16 12:38:17'),
-(42, 'Jeffrey', 'B', 'Negros', 'regular', 'BEM', '2024-01-16 12:38:31');
+INSERT INTO `faculty` (`id`, `first_name`, `middle`, `last_name`, `emp_type`, `department`, `datetime`, `my_stock`) VALUES
+(1, 'Aljon', 'L', 'Abines', 'regular', 'Engineering', '2024-01-16 12:25:29', 0),
+(2, 'Jude Michael', '', 'Badajos', 'regular', 'Engineering', '2024-01-16 12:26:18', 0),
+(3, 'Greg', 'S', 'Campos', 'regular', 'Engineering', '2024-01-16 12:26:32', 0),
+(4, 'Catherine', 'B', 'Catindoy', 'regular', 'Engineering', '2024-01-16 12:26:43', 0),
+(5, 'Samuel', 'S', 'Sudario', 'regular', 'Engineering', '2024-01-16 12:26:54', 0),
+(6, 'John Paul', '', 'Villanueva', 'regular', 'Engineering', '2024-01-16 12:27:57', 0),
+(7, 'Jasten Keneth', 'D', 'Treceñe', 'regular', 'Engineering', '2024-01-16 12:28:17', 0),
+(8, 'Marites', 'M', 'Bardelas', 'regular', 'Engineering', '2024-01-16 12:28:37', 0),
+(9, 'Michael', 'B', 'Batan', 'regular', 'Engineering', '2024-01-16 12:28:46', 0),
+(10, 'Ira Gem', 'A', 'Albasin-Lacaba', 'regular', 'Education', '2024-01-16 12:29:39', 0),
+(11, 'Medeliza', 'P', 'Avenir', 'regular', 'Education', '2024-01-16 12:29:57', 0),
+(12, 'Mary Ann', 'A', 'Balagasay', 'regular', 'Education', '2024-01-16 12:30:10', 0),
+(13, 'Belinda', 'R', 'Basas', 'regular', 'Education', '2024-01-16 12:30:21', 0),
+(14, 'Sofio Rocky', 'T', 'Caminoc', 'regular', 'Education', '2024-01-16 12:30:50', 0),
+(15, 'Joseph', '', 'Cervantes', 'regular', 'Education', '2024-01-16 12:31:07', 0),
+(16, 'Eduardo Edu', 'C', 'Cornillez, Jr.', 'regular', 'Education', '2024-01-16 12:31:30', 0),
+(17, 'Emelita', 'Y', 'Eguillos', 'regular', 'Education', '2024-01-16 12:31:43', 0),
+(18, 'Ma. Chona', '', 'Fabre', 'regular', 'Education', '2024-01-16 12:31:56', 0),
+(19, 'Ramelito', 'R', 'Paler', 'regular', 'Education', '2024-01-16 12:32:09', 0),
+(20, 'Teodora', 'S', 'Picson', 'regular', 'Education', '2024-01-16 12:32:22', 0),
+(21, 'Jerome', 'S', 'Tilana', 'regular', 'Education', '2024-01-16 12:32:32', 0),
+(22, 'James', 'R', 'Pedrera', 'regular', 'Education', '2024-01-16 12:32:45', 0),
+(23, 'Meldrid', 'B', 'Miranda', 'regular', 'Education', '2024-01-16 12:32:57', 0),
+(24, 'Jerico Ralph', 'P', 'Abides', 'regular', 'Technology', '2024-01-16 12:33:25', 0),
+(25, 'Paul Mikie', 'Q', 'Alcober', 'regular', 'Technology', '2024-01-16 12:33:44', 0),
+(26, 'Doretta Cleofe', 'D', 'Aniñon', 'regular', 'Technology', '2024-01-16 12:34:06', 0),
+(27, 'Rex Vincent', 'F', 'Enderio', 'regular', 'Technology', '2024-01-16 12:34:50', 0),
+(28, 'Bryan Dino Lester', 'M', 'Garnica', 'regular', 'Technology', '2024-01-16 12:35:08', 0),
+(29, 'Nikki', 'J', 'Malquisto', 'regular', 'Technology', '2024-01-16 12:35:23', 0),
+(30, 'Aiza', 'P', 'Meniano', 'regular', 'Technology', '2024-01-16 12:35:34', 0),
+(31, 'Cathy Faye', 'P', 'Pedrosa', 'regular', 'Technology', '2024-01-16 12:35:46', 0),
+(32, 'Deolito', 'V', 'Legaspi', 'regular', 'Technology', '2024-01-16 12:36:06', 0),
+(33, 'Cecil', 'B', 'Abucot', 'regular', 'BEM', '2024-01-16 12:36:31', 0),
+(34, 'Melissa', 'A', 'Dela Cruz', 'regular', 'BEM', '2024-01-16 12:36:42', 0),
+(35, 'Grace', 'N', 'Dumrigue', 'regular', 'BEM', '2024-01-16 12:37:01', 0),
+(36, 'Erap', 'M', 'Gultian', 'regular', 'BEM', '2024-01-16 12:37:14', 0),
+(37, 'Zosilyn', 'M', 'Malate', 'regular', 'BEM', '2024-01-16 12:37:25', 0),
+(38, 'Meg Anne', 'M', 'Villero', 'regular', 'BEM', '2024-01-16 12:37:37', 0),
+(39, 'Reynalyn', '', 'Barbosa', 'regular', 'BEM', '2024-01-16 12:37:54', 0),
+(40, 'Yolanda', '', 'Cabo', 'regular', 'BEM', '2024-01-16 12:38:04', 0),
+(41, 'Marilou', 'G', 'Perez', 'regular', 'BEM', '2024-01-16 12:38:17', 0),
+(42, 'Jeffrey', 'B', 'Negros', 'regular', 'BEM', '2024-01-16 12:38:31', 0);
 
 -- --------------------------------------------------------
 
@@ -126,7 +127,7 @@ CREATE TABLE `items` (
   `project_id` varchar(255) NOT NULL,
   `date` varchar(255) NOT NULL,
   `qty_added` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `items`
@@ -147,20 +148,7 @@ CREATE TABLE `logs` (
   `quantity` int(255) DEFAULT NULL,
   `updated` datetime NOT NULL DEFAULT current_timestamp(),
   `userid` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `logs`
---
-
-INSERT INTO `logs` (`id`, `log`, `quantity`, `updated`, `userid`) VALUES
-(1, 'Sold a stock of', 25, '2024-01-17 07:33:03', '1'),
-(2, 'Added a Product Named Test Booklet with an Initial Stock of', 150, '2024-02-09 18:31:52', '1'),
-(7, 'Sold a stock of', 50, '2024-02-19 09:05:36', '1'),
-(8, 'Sold a stock of', 50, '2024-02-19 09:05:52', '7'),
-(9, 'Sold a stock of', 50, '2024-02-19 09:05:57', '7'),
-(10, 'Sold a stock of', 20, '2024-02-19 09:26:02', '7'),
-(11, 'Sold a stock of', 30, '2024-02-27 20:41:53', '1');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -175,17 +163,15 @@ CREATE TABLE `products` (
   `department` varchar(255) NOT NULL,
   `stock` int(11) NOT NULL DEFAULT 0,
   `updated` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `products`
 --
 
 INSERT INTO `products` (`id`, `type`, `description`, `department`, `stock`, `updated`) VALUES
-(9, 'Module', '', 'Technology', 15, '2023-12-28 16:18:35'),
-(10, 'Test Booklet', 'somethinga adi', 'Engineering', 100, '2024-01-13 20:44:32'),
-(11, 'Module', 'somethingy', 'BEM', 50, '2024-01-15 11:33:56'),
-(12, 'Test Booklet', 'dsadasdsa', 'Education', 100, '2024-02-09 18:31:52');
+(13, 'Module', 'yellow color', 'Engineering', 750, '2024-02-19 20:12:36'),
+(14, 'Test Booklet', '', 'Engineering', 10000, '2024-02-19 20:12:47');
 
 -- --------------------------------------------------------
 
@@ -198,7 +184,7 @@ CREATE TABLE `projects` (
   `name` varchar(255) NOT NULL,
   `total` varchar(255) DEFAULT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `projects`
@@ -218,7 +204,14 @@ CREATE TABLE `remarks_complaint` (
   `user` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `datetime` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `remarks_complaint`
+--
+
+INSERT INTO `remarks_complaint` (`id`, `user`, `description`, `datetime`) VALUES
+(1, '13', 'PISTE KAMO\r\n', '2024-03-18 16:24:05');
 
 -- --------------------------------------------------------
 
@@ -239,15 +232,15 @@ CREATE TABLE `reports` (
   `date_pay` date NOT NULL,
   `date_approved` datetime NOT NULL DEFAULT current_timestamp(),
   `c_receipt` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `reports`
 --
 
 INSERT INTO `reports` (`id`, `billing_stall`, `rent_bal`, `water_bal`, `electricity_bal`, `other_bal`, `amount`, `amount_paid`, `date_filed`, `date_pay`, `date_approved`, `c_receipt`) VALUES
-(1, 1, '1234', '1234', '1234', '1234', '4936', '4000', '2023-12-04 10:31:33', '2024-01-04', '2024-01-04 10:33:47', '020420240332.jpg'),
-(2, 1, '1234', '1234', '1234', '1234', '4936', '4936', '2024-01-04 10:37:48', '2024-02-04', '2024-02-04 11:09:01', '020420240408.jpg');
+(17, 1, '1500', '200', '200', '100', '2000', '1500', '2024-04-15 10:10:50', '2024-04-15', '2024-04-15 10:16:17', '041520240416.png'),
+(18, 2, '1500', '100', '100', '200', '1900', '1900', '2024-04-15 10:17:42', '2024-04-15', '2024-04-15 10:25:34', '041520240425.jpg');
 
 -- --------------------------------------------------------
 
@@ -261,15 +254,7 @@ CREATE TABLE `requests` (
   `user_id` int(255) NOT NULL,
   `stock` int(11) NOT NULL DEFAULT 0,
   `datetime` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `requests`
---
-
-INSERT INTO `requests` (`id`, `product`, `user_id`, `stock`, `datetime`) VALUES
-(1, 12, 1, 30, '2024-02-27 20:42:02'),
-(2, 10, 1, 30, '2024-02-27 20:42:06');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -283,14 +268,14 @@ CREATE TABLE `requirements` (
   `req_name` varchar(255) NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `requirements`
 --
 
 INSERT INTO `requirements` (`id`, `user_id`, `req_name`, `file_name`, `date`) VALUES
-(1, 2, 'Mayor\'s business permit', 'img_20191011_073704.jpg', '2024-01-10 12:48:51');
+(2, 13, 'Mayor\'s business permit', '370715941_2876307192506467_3965909584895764223_n.jpg', '2024-03-18 16:23:40');
 
 -- --------------------------------------------------------
 
@@ -302,7 +287,7 @@ CREATE TABLE `stalls` (
   `stall_id` int(11) NOT NULL,
   `stall_name` varchar(255) NOT NULL,
   `stall_desc` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `stalls`
@@ -329,15 +314,15 @@ CREATE TABLE `tenant` (
   `stall_id` int(255) NOT NULL,
   `user` int(255) NOT NULL,
   `date_assigned` date NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tenant`
 --
 
 INSERT INTO `tenant` (`tenant_id`, `stall_id`, `user`, `date_assigned`) VALUES
-(1, 1, 2, '2023-11-26'),
-(6, 6, 7, '2023-12-06');
+(7, 1, 13, '2024-03-18'),
+(8, 2, 14, '2024-04-03');
 
 -- --------------------------------------------------------
 
@@ -357,7 +342,7 @@ CREATE TABLE `users` (
   `middle` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
@@ -365,11 +350,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `password`, `phone`, `user_type`, `stall_id`, `profile_picture`, `faculty_id`, `first_name`, `middle`, `last_name`, `username`) VALUES
 (1, '21232f297a57a5a743894a0e4a801fc3', '09123456789', 'Administrator', 0, NULL, NULL, 'Administrator', '', 'something', 'admin'),
-(2, 'baf6d30b26892427652771dda7e898a5', '09565945151', 'Concessionaires', 1, NULL, NULL, 'Jerose', '', 'something', 'jerose'),
-(7, 'baf6d30b26892427652771dda7e898a5', '09595626323', 'Concessionaires', 6, 'img_avatar.png', NULL, 'Charles', '', 'Mijares', 'Mijares'),
 (10, 'baf6d30b26892427652771dda7e898a5', '09531267413', 'Faculty', 0, NULL, 1, '', '', '', 'aljon'),
 (11, 'baf6d30b26892427652771dda7e898a5', '09859821416', 'Faculty', 0, NULL, 7, '', '', '', 'jasten'),
-(12, 'baf6d30b26892427652771dda7e898a5', '09656134854', 'Faculty', 0, NULL, 3, '', '', '', 'tc_eng_gsc');
+(12, 'baf6d30b26892427652771dda7e898a5', '09105673457', 'Faculty', 0, NULL, 30, '', '', '', 'tc_tec_apm'),
+(13, 'baf6d30b26892427652771dda7e898a5', '09308937202', 'Concessionaires', 1, NULL, 0, 'ARIANE', 'C', 'CRUZ', 'tc_acc'),
+(14, 'baf6d30b26892427652771dda7e898a5', '09458291279', 'Concessionaires', 2, NULL, 0, 'Marilyn', '', 'Bongo', 'tc_mb');
 
 --
 -- Indexes for dumped tables
@@ -462,7 +447,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `billing`
 --
 ALTER TABLE `billing`
-  MODIFY `billing_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `billing_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `faculty`
@@ -480,13 +465,13 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `projects`
@@ -498,25 +483,25 @@ ALTER TABLE `projects`
 -- AUTO_INCREMENT for table `remarks_complaint`
 --
 ALTER TABLE `remarks_complaint`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `reports`
 --
 ALTER TABLE `reports`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `requests`
 --
 ALTER TABLE `requests`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `requirements`
 --
 ALTER TABLE `requirements`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `stalls`
@@ -528,13 +513,13 @@ ALTER TABLE `stalls`
 -- AUTO_INCREMENT for table `tenant`
 --
 ALTER TABLE `tenant`
-  MODIFY `tenant_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `tenant_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `user_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
