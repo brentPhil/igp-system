@@ -64,15 +64,8 @@ $stallx = $conn->query($query);
                     </thead>
                     <tbody>
                     <?php
-                    $result = mysqli_query($conn,"
-                      SELECT b.*, s.stall_name 
-                      FROM billing b 
-                      INNER JOIN stalls s ON b.billing_stall = s.stall_id 
-                      INNER JOIN (
-                          SELECT billing_stall, MAX(date_filed) AS max_date_filed 
-                          FROM billing 
-                          GROUP BY billing_stall
-                      ) max_dates ON b.billing_stall = max_dates.billing_stall AND b.date_filed = max_dates.max_date_filed");
+                    $result = mysqli_query($conn,"SELECT * FROM billing INNER JOIN stalls ON billing.billing_stall = stalls.stall_id");
+                      
                     while($row = mysqli_fetch_array($result)) {
                       $date_filed = $row['date_filed'];
                       $time = strtotime($date_filed);
@@ -91,25 +84,27 @@ $stallx = $conn->query($query);
                         </td>
                         <td class="d-flex justify-content-end">
                           <button class='btn btn-success btn-sm mr-2' data-bs-toggle='tooltip' data-bs-placement='top' title='print receipt'><i class='bi bi-printer'></i></button>
-                          <button class="btn btn-primary btn-sm mr-2" data-bs-toggle='tooltip' data-bs-placement='top' title='view receipt' data-toggle="modal" data-target="#c_receipt<?php echo ($row["billing_id"]); ?>">
+                          <button class="btn btn-primary btn-sm mr-2 view-receipt" data-bs-toggle='tooltip' data-bs-placement='top' title='view receipt' data-billing-id="<?php echo $row['billing_id']; ?>" data-toggle="modal" data-target="#c_receiptModal">
                             <i class="bi bi-receipt"></i>
                             <?php if(!empty($row['c_receipt']) && $row['status'] == 0): ?>
                               <span class="badge badge-danger">1</span>
                             <?php endif; ?>
                           </button>
-                          <button class="btn btn-warning btn-sm mr-2" data-bs-toggle='tooltip' data-bs-placement='top' title='view payment details' data-toggle="modal" data-target="#balance<?php echo ($row["billing_id"]); ?>">
+                          <button class="btn btn-warning btn-sm mr-2 view-payment-details" data-bs-toggle='tooltip' data-bs-placement='top' title='view payment details' data-billing-id="<?php echo $row['billing_id']; ?>" data-toggle="modal" data-target="#balanceModal">
                             <i class='bi bi-eye'></i>
                           </button>
                           <button class='deleteBtnBill btn btn-danger btn-sm' data-bs-toggle='tooltip' data-bs-placement='top' title='Remove bill' data-billing_id='<?php echo $row['billing_id'] ?>'><i class="bi bi-trash3"></i></button>
                         </td>
                       </tr>
                       <?php
-                      include 'include/c_receipt.php';
-                      include 'include/balance.php';
                     }
                     ?>
                     </tbody>
                   </table>
+                    <?php
+                      include 'include/c_receipt.php';
+                      include 'include/balance.php'; 
+                    ?>
                 </div>
               </div>
             </div>
@@ -128,6 +123,7 @@ $stallx = $conn->query($query);
     </div>
     <!-- page-body-wrapper ends -->
   </div>
+
   <div class="modal fade" id="upload" tabindex="-1" role="dialog" aria-labelledby="Billing Form" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -232,6 +228,7 @@ $stallx = $conn->query($query);
   <script src="vendors/sweetalert2/sweetalert2.js"></script>
   <!-- Delete -->
   <script src="js/delete.js"></script>
+
   <script type="text/javascript">
     $(document).ready(function () {
       new DataTable('#myTable', {
